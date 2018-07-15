@@ -12,19 +12,17 @@ services:
           - php
 
     mysql:
-        image: mysql
+        image: mysql:5.7
         container_name: sf4_mysql
         volumes:
             - .docker/data/db:/var/lib/mysql
+        ports:
+          - 3306:3306
         environment:
             MYSQL_ROOT_PASSWORD: root
             MYSQL_DATABASE: sf4
             MYSQL_USER: sf4
             MYSQL_PASSWORD: sf4
-        ports:
-        # just if you also want to access it directly from you host
-        # node neede for phpmyadmin
-        - "3306:3306"
 
     php:
         build: .docker/php
@@ -40,12 +38,13 @@ services:
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
         container_name: sf4_phpmyadmin
+        restart: always
         ports:
             - 8080:80
         links:
             - mysql
         environment:
-            PMA_HOST: mysql
+          PMA_HOST: mysql
 
     maildev:
         image: djfarrelly/maildev

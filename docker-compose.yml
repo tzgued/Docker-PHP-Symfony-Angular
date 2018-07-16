@@ -1,15 +1,21 @@
-version: '3'
+# Run docker-compose build
+# Run docker-compose up
+# Live long and prosper
+
+version: '3.1'
 services:
     apache:
         build: .docker/apache
         container_name: sf4_apache
         ports:
-          - 80:80
+          - 82:80
         volumes:
           - .docker/config/vhosts:/etc/apache2/sites-enabled
           - ./SF4_project:/home/wwwroot/sf4
         depends_on:
           - php
+        
+          
 
     mysql:
         image: mysql:5.7
@@ -23,6 +29,8 @@ services:
             MYSQL_DATABASE: sf4
             MYSQL_USER: sf4
             MYSQL_PASSWORD: sf4
+        
+          
 
     php:
         build: .docker/php
@@ -34,6 +42,8 @@ services:
         depends_on:
           - maildev
           - mysql
+        
+          
 
     phpmyadmin:
         image: phpmyadmin/phpmyadmin
@@ -45,9 +55,24 @@ services:
             - mysql
         environment:
           PMA_HOST: mysql
+        
+          
 
     maildev:
         image: djfarrelly/maildev
         container_name: sf4_maildev
         ports:
           - 8001:80
+        
+          
+
+    nginx:
+      container_name: angular_nginx
+      build: .docker/nginx
+      volumes:
+        - ./Angular-project/dist/Angular-project:/usr/share/nginx/html
+      ports:
+        - "81:80"
+        - "443:443"
+      
+        

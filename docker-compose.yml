@@ -11,7 +11,7 @@ services:
           - 82:80
         volumes:
           - .docker/config/vhosts:/etc/apache2/sites-enabled
-          - ./SF4_project:/home/wwwroot/sf4
+          - ${SYMFONY_APP}:/home/wwwroot/sf4
         depends_on:
           - php
         
@@ -25,10 +25,10 @@ services:
         ports:
           - 3306:3306
         environment:
-            MYSQL_ROOT_PASSWORD: root
-            MYSQL_DATABASE: sf4
-            MYSQL_USER: sf4
-            MYSQL_PASSWORD: sf4
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
         
           
 
@@ -36,7 +36,7 @@ services:
         build: .docker/php
         container_name: sf4_php
         volumes:
-          - ./SF4_project:/home/wwwroot/sf4
+          - ${SYMFONY_APP}:/home/wwwroot/sf4
         environment:
           - maildev_host=sf4_maildev
         depends_on:
@@ -70,9 +70,23 @@ services:
       container_name: angular_nginx
       build: .docker/nginx
       volumes:
-        - ./Angular-project/dist/Angular-project:/usr/share/nginx/html
+        - ${ANGULAR_APP}/dist/Angular-project:/usr/share/nginx/html
       ports:
         - "81:80"
         - "443:443"
       
-        
+    node:
+        build: .docker/node
+        container_name: angular_node
+        ports:
+            - 4200:4200
+        volumes:
+            - ${ANGULAR_APP}:/home/node/app/frontend
+        tty: true
+        command:
+            - /bin/sh
+            - -c
+            - |
+                cd /home/node/app/frontend && npm start
+        expose:
+            - "4200"
